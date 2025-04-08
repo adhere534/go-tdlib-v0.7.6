@@ -97,6 +97,7 @@ func (client *Client) receiver() {
 
 		if typ.GetType() == TypeUpdateAuthorizationState && typ.(*UpdateAuthorizationState).AuthorizationState.AuthorizationStateType() == TypeAuthorizationStateClosed {
 			//close(client.responses)
+			return
 		}
 	}
 }
