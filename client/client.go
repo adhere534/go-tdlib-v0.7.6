@@ -15,7 +15,6 @@ type Client struct {
 	catchersStore  *sync.Map
 	updatesTimeout time.Duration
 	catchTimeout   time.Duration
-	stop           chan struct{} // 新增停止信号
 }
 
 type Option func(*Client)
@@ -50,7 +49,6 @@ func NewClient(authorizationStateHandler AuthorizationStateHandler, options ...O
 		responses:     make(chan *Response, 1000),
 		listenerStore: newListenerStore(),
 		catchersStore: &sync.Map{},
-		stop:          make(chan struct{}), // 初始化 stop
 	}
 
 	client.extraGenerator = UuidV4Generator()
@@ -98,8 +96,7 @@ func (client *Client) receiver() {
 		}
 
 		if typ.GetType() == TypeUpdateAuthorizationState && typ.(*UpdateAuthorizationState).AuthorizationState.AuthorizationStateType() == TypeAuthorizationStateClosed {
-			close(client.responses)
-			close(client.stop) // 发送停止信号
+			//close(client.responses)
 		}
 	}
 }

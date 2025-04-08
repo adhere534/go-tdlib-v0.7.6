@@ -68,11 +68,7 @@ func (instance *tdlib) receiver() {
 			log.Print(err)
 			continue
 		}
-		select {
-		case <-client.stop:
-			return // 退出 receiver
-		default:
-		}
+
 		client.responses <- resp
 	}
 }
