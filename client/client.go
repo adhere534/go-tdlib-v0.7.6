@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"errors"
-	"log"
 	"sync"
 	"time"
 )
@@ -97,8 +96,7 @@ func (client *Client) receiver() {
 		}
 
 		if typ.GetType() == TypeUpdateAuthorizationState && typ.(*UpdateAuthorizationState).AuthorizationState.AuthorizationStateType() == TypeAuthorizationStateClosed {
-			//close(client.responses)
-			log.Printf("Authorization closed, stopping Client receiver")
+			close(client.responses)
 			return
 		}
 	}
