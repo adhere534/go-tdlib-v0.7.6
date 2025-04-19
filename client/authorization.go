@@ -142,7 +142,7 @@ func CliInteractor(clientAuthorizer *clientAuthorizer, phoneNumber string) bool 
 		select {
 		case state, ok := <-clientAuthorizer.State:
 			if !ok {
-				return
+				return false
 			}
 
 			switch state.AuthorizationStateType() {
