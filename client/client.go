@@ -96,8 +96,10 @@ func (client *Client) receiver() {
 		}
 
 		if typ.GetType() == TypeUpdateAuthorizationState && typ.(*UpdateAuthorizationState).AuthorizationState.AuthorizationStateType() == TypeAuthorizationStateClosing {
-
-			close(client.responses)
+			//close(client.responses)
+			// 先从tdlib实例中移除客户端
+			//tdlibInstance.removeClient(client.jsonClient.id)
+			//tdlibInstance.Close()
 			return
 		}
 	}
