@@ -21,7 +21,7 @@ var tdlibInstance *tdlib
 
 func init() {
 	tdlibInstance = &tdlib{
-		timeout: 60 * time.Second,
+		timeout: 3 * time.Second,
 		clients: map[int]*Client{},
 	}
 }

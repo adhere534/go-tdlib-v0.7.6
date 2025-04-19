@@ -95,8 +95,9 @@ func (client *Client) receiver() {
 			client.listenerStore.gc()
 		}
 
-		if typ.GetType() == TypeUpdateAuthorizationState && typ.(*UpdateAuthorizationState).AuthorizationState.AuthorizationStateType() == TypeAuthorizationStateClosed {
-			//close(client.responses)
+		if typ.GetType() == TypeUpdateAuthorizationState && typ.(*UpdateAuthorizationState).AuthorizationState.AuthorizationStateType() == TypeAuthorizationStateClosing {
+
+			close(client.responses)
 			return
 		}
 	}
