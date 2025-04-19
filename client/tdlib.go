@@ -23,7 +23,6 @@ func init() {
 	tdlibInstance = &tdlib{
 		timeout: 60 * time.Second,
 		clients: map[int]*Client{},
-		done:    make(chan struct{}), // 初始化done通道
 	}
 }
 
@@ -32,7 +31,6 @@ type tdlib struct {
 	timeout time.Duration
 	mu      sync.Mutex
 	clients map[int]*Client
-	done    chan struct{} // 添加一个done通道用于控制receiver的退出
 }
 
 func (instance *tdlib) addClient(client *Client) {
@@ -60,36 +58,18 @@ func (instance *tdlib) getClient(id int) (*Client, error) {
 
 func (instance *tdlib) receiver() {
 	for {
-		select {
-		case <-instance.done:
-			return // 收到退出信号时直接返回
-		default:
-			resp, err := instance.receive(instance.timeout)
-			if err != nil {
-				continue
-			}
-
-			client, err := instance.getClient(resp.ClientId)
-			if err != nil {
-				log.Print(err)
-				continue
-			}
-
-			// 检查客户端是否还存在
-			instance.mu.Lock()
-			_, exists := instance.clients[resp.ClientId]
-			instance.mu.Unlock()
-			if !exists {
-				continue
-			}
-
-			// 尝试发送响应，如果通道已关闭则跳过
-			select {
-			case client.responses <- resp:
-			default:
-				log.Printf("Failed to send response to client %d: channel might be closed or full", resp.ClientId)
-			}
+		resp, err := instance.receive(instance.timeout)
+		if err != nil {
+			continue
 		}
+
+		client, err := instance.getClient(resp.ClientId)
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+
+		client.responses <- resp
 	}
 }
 
@@ -238,18 +218,4 @@ func (jsonInt64 *JsonInt64) UnmarshalJSON(data []byte) error {
 type Type interface {
 	GetType() string
 	GetClass() string
-}
-
-// 添加关闭方法
-func (instance *tdlib) Close() {
-	instance.mu.Lock()
-	defer instance.mu.Unlock()
-
-	close(instance.done) // 通知receiver退出
-
-	// 清理所有客户端
-	for _, client := range instance.clients {
-		close(client.responses)
-	}
-	instance.clients = make(map[int]*Client)
 }

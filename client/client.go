@@ -63,14 +63,10 @@ func NewClient(authorizationStateHandler AuthorizationStateHandler, options ...O
 
 	err := Authorize(client, authorizationStateHandler)
 	if err != nil {
-		return nil, err
+		return client, err
 	}
 
 	return client, nil
-}
-
-func (client *Client) Close2() {
-	tdlibInstance.Close()
 }
 
 func (client *Client) receiver() {
@@ -100,10 +96,7 @@ func (client *Client) receiver() {
 		}
 
 		if typ.GetType() == TypeUpdateAuthorizationState && typ.(*UpdateAuthorizationState).AuthorizationState.AuthorizationStateType() == TypeAuthorizationStateClosed {
-			close(client.responses)
-			// 先从tdlib实例中移除客户端
-			//tdlibInstance.removeClient(client.jsonClient.id)
-			//tdlibInstance.Close()
+			//close(client.responses)
 			return
 		}
 	}
