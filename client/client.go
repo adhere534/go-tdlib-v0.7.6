@@ -54,7 +54,7 @@ func NewClient(authorizationStateHandler AuthorizationStateHandler, options ...O
 	client.extraGenerator = UuidV4Generator()
 	client.catchTimeout = 60 * time.Second
 
-	TdlibInstance.addClient(client)
+	tdlibInstance.addClient(client)
 	go client.receiver()
 
 	for _, option := range options {
@@ -67,6 +67,10 @@ func NewClient(authorizationStateHandler AuthorizationStateHandler, options ...O
 	}
 
 	return client, nil
+}
+
+func (client *Client) Close2() {
+	tdlibInstance.Close()
 }
 
 func (client *Client) receiver() {
