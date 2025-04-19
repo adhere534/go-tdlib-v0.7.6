@@ -69,10 +69,19 @@ func (instance *tdlib) receiver() {
 			continue
 		}
 
+		// 检查客户端是否还存在且通道是否已关闭
+		instance.mu.Lock()
+		_, exists := instance.clients[resp.ClientId]
+		instance.mu.Unlock()
+		if !exists {
+			continue
+		}
+
 		select {
 		case client.responses <- resp:
 		default:
 			// 通道已关闭或已满,跳过发送
+			log.Printf("Failed to send response to client %d: channel might be closed or full", resp.ClientId)
 		}
 	}
 }
