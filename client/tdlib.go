@@ -17,10 +17,10 @@ import (
 	"unsafe"
 )
 
-var tdlibInstance *tdlib
+var TdlibInstance *tdlib
 
 func init() {
-	tdlibInstance = &tdlib{
+	TdlibInstance = &tdlib{
 		timeout: 3 * time.Second,
 		clients: map[int]*Client{},
 		done:    make(chan struct{}), // 初始化done通道
