@@ -137,32 +137,29 @@ func (stateHandler *clientAuthorizer) Close() {
 	close(stateHandler.Password)
 }
 
-func CliInteractor(clientAuthorizer *clientAuthorizer, phoneNumber string) bool {
+func CliInteractor(clientAuthorizer *clientAuthorizer) {
 	for {
 		select {
 		case state, ok := <-clientAuthorizer.State:
 			if !ok {
-				return false
+				return
 			}
 
 			switch state.AuthorizationStateType() {
 			case TypeAuthorizationStateWaitPhoneNumber:
-				//fmt.Println("Enter phone number: ")
-				//var phoneNumber string
-				//fmt.Scanln(&phoneNumber)
+				fmt.Println("Enter phone number: ")
+				var phoneNumber string
+				fmt.Scanln(&phoneNumber)
 
 				clientAuthorizer.PhoneNumber <- phoneNumber
 
 			case TypeAuthorizationStateWaitCode:
-				//var code string
-				//
-				//fmt.Println("Enter code: ")
-				//fmt.Scanln(&code)
-				//
-				//clientAuthorizer.Code <- code
-				return false
-			case TypeAuthorizationStateClosing:
-				return true
+				var code string
+
+				fmt.Println("Enter code: ")
+				fmt.Scanln(&code)
+
+				clientAuthorizer.Code <- code
 
 			case TypeAuthorizationStateWaitPassword:
 				fmt.Println("Enter password: ")
@@ -172,7 +169,7 @@ func CliInteractor(clientAuthorizer *clientAuthorizer, phoneNumber string) bool 
 				clientAuthorizer.Password <- password
 
 			case TypeAuthorizationStateReady:
-				return false
+				return
 			}
 		}
 	}
