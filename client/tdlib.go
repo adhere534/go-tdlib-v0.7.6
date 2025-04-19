@@ -69,7 +69,11 @@ func (instance *tdlib) receiver() {
 			continue
 		}
 
-		client.responses <- resp
+		select {
+		case client.responses <- resp:
+		default:
+			// 通道已关闭或已满,跳过发送
+		}
 	}
 }
 
