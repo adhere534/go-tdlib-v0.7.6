@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -97,10 +98,10 @@ func (stateHandler *clientAuthorizer) Handle(client *Client, state Authorization
 		return NotSupportedAuthorizationState(state)
 
 	case TypeAuthorizationStateWaitCode:
-		_, err := client.CheckAuthenticationCode(&CheckAuthenticationCodeRequest{
-			Code: <-stateHandler.Code,
-		})
-		return err
+		//_, err := client.CheckAuthenticationCode(&CheckAuthenticationCodeRequest{
+		//	Code: <-stateHandler.Code,
+		//})
+		return errors.New("close input code")
 
 	case TypeAuthorizationStateWaitOtherDeviceConfirmation:
 		return NotSupportedAuthorizationState(state)
